@@ -1,6 +1,7 @@
 const createHttpsRequest = getUtil('createHttpsRequest');
 
-const fetchFakeData = id => {
+const fetchFakeData = function() {
+    const { id } = this.ctx.params;
     let fakePath = "/todos";
     if(id !== undefined) {
         fakePath = fakePath + '/' +id;
