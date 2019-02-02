@@ -1,10 +1,9 @@
-const path = require('path');
 const createHttpsRequest = getUtil('createHttpsRequest');
 
 const fetchFakeData = id => {
     let fakePath = "/todos";
     if(id !== undefined) {
-        fakePath = path.join(fakePath, id);
+        fakePath = fakePath + '/' +id;
     }
     const options = {
         hostname: 'jsonplaceholder.typicode.com',

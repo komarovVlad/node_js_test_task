@@ -5,6 +5,6 @@ const handler = async ctx => {
 
 module.exports = {
     method: 'get',
-    path: '/todos/:id',
+    path: '/todos/:id*',
     handler
 };
