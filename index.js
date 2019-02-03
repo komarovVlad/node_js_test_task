@@ -24,6 +24,6 @@ routes.forEach(route => router[route.method](route.path, route.handler));
 app.use(router.routes());
 
 if(!module.parent){
-    app.listen(config.port, () => logMessage(`Server is listening on port: ${config.port}`));
+    app.listen(config.port, () => console.log(`Server is listening on port: ${config.port}`));
 }
 module.exports = app;

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon --inspect index.js",
-    "test": "cross-env NODE_ENV=test mocha server.test.js"
+    "test": "cross-env NODE_ENV=test mocha --opts ./mocha.opts server.test.js"
   },
   "dependencies": {
     "koa": "^2.7.0",

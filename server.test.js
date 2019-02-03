@@ -1,21 +1,24 @@
-const app = require('./index.js');
+require('./globals').setGlobals();
 const childProcess = require('child_process');
 const config = getConfig();
 const createHttpRequest = getUtil('createRequest')();
 const assert = require('assert');
 
 let server;
+const processServer = () => new Promise(resolve => {
+    server = childProcess.spawn('node', ['index.js']);
+    server.stdout.on('data', resolve);
+});
+
 
 describe('API Server', () => {
+    before(() => processServer());
+    after(done => {
+        server.kill();
+        done();
+    });
     describe('POST /api/data', () => {
-        before(done => {
-            server = childProcess.fork('./index.js');
-            done();
-        });
-        after(done => {
-            server.kill();
-            done()
-        });
+        after(() => processServer());
         it('Should return extended payload with random field "a" in range 1...6', async () => {
             const minRandomValue = 1;
             const maxRandomValue = 6;
@@ -59,13 +62,10 @@ describe('API Server', () => {
                     resolve();
                 })
             }).then(() => server.removeAllListeners());
-
         });
     });
 
     describe('GET /api/todos/:id*', () => {
-        before(done => server = app.listen(config.port, done));
-        after(done => server.close(done));
         it('Should return single todo with specified id in path from "jsonplaceholder" service', async () => {
             const expectedStatusCode = 200;
             const specifiedId = 1;
@@ -111,8 +111,6 @@ describe('API Server', () => {
     });
 
     describe('404 - Not Found', () => {
-        before(done => server = app.listen(config.port, done));
-        after(done => server.close(done));
         it('Should return 404 if route is not found', () => {
             const expectedStatusCode = 404;
             const httpOptions = {
