@@ -1,4 +1,4 @@
-const createHttpsRequest = getUtil('createHttpsRequest');
+const createHttpsRequest = getUtil('createRequest')('https');
 
 const fetchFakeData = function() {
     const { id } = this.ctx.params;

@@ -1,19 +1,12 @@
 const https = require('https');
+const http = require('http');
 
 const ENCODING = 'utf8';
 const API_ERROR_MESSAGE = 'API_ERROR';
 const JSON_ERROR_MESSAGE = 'CORRUPTED_JSON';
 const DEFAULT_TIMEOUT = 30 * 1000;
-const DEFAULT_PORT = 443;
 const DEFAULT_CONTENT_TYPE = "application/json";
-
-const defaultHttpOptions = {
-    port: DEFAULT_PORT,
-    timeout: DEFAULT_TIMEOUT,
-    headers: {
-        "Content-Type": DEFAULT_CONTENT_TYPE
-    }
-};
+const getDefaultPort = requestType => requestType === 'https' ? 443 : 80;
 
 const createError =  (body, res, options, data, error)  => {
     body.statusCode = res.statusCode;
@@ -24,7 +17,15 @@ const createError =  (body, res, options, data, error)  => {
     return body;
 };
 
-const createHttpsRequest = (httpOptions, data) => new Promise((resolve, reject) => {
+const createRequest = requestType => (httpOptions, data) => new Promise((resolve, reject) => {
+    const requestModule = requestType === 'https' ? https : http;
+    const defaultHttpOptions = {
+        port: getDefaultPort(requestType),
+        timeout: DEFAULT_TIMEOUT,
+        headers: {
+            "Content-Type": DEFAULT_CONTENT_TYPE
+        }
+    };
     const options = {
         ...defaultHttpOptions,
         ...httpOptions,
@@ -33,15 +34,13 @@ const createHttpsRequest = (httpOptions, data) => new Promise((resolve, reject) 
             ...httpOptions.headers
         }
     };
-    const request = https.request(options, res => {
+    const request = requestModule.request(options, res => {
         let response = {};
         let bodyString = '';
         let body;
 
         res.setEncoding(ENCODING);
-        res.on('data', chunk => {
-            bodyString += chunk;
-        });
+        res.on('data', chunk => bodyString += chunk);
         res.on('end', () => {
             bodyString = bodyString || '{}';
             try {
@@ -80,4 +79,4 @@ const createHttpsRequest = (httpOptions, data) => new Promise((resolve, reject) 
     request.end();
 });
 
-module.exports = createHttpsRequest;
+module.exports = createRequest;
